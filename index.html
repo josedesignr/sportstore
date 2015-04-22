@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html ng-app="tiendaDeportiva" lang='es'>
+	<meta charset='UTF-8'></meta>
+	<title>Tienda Deportiva</title>
+	<meta name='description' content= "SportStore es una tienda de camisetas de fútbol"></meta>
+	<meta name="keywords" content="fútbol, camisetas, jerseys, sport"/>
+	<meta name="viewport" content="width=device-width" initial-scale=1 minimum-scale=1 maximum-scale=1/>
+	<head>
+		<!--Aquí ya está Bootstrap y todo, en un solo css compilado por Stylus.-->
+		<link rel='stylesheet' href='css/bootstrap.min.css'/>
+		<link rel='stylesheet' href='css/estilos.css'/>
+	</head>
+
+	<body>
+		<section class="contenido" ng-controller="ControladorTienda as tienda">
+			<header class="contenido-left">
+				<h1>FPCstats</h1>
+				<ul class="mainMenu">
+					<li class="mainMenu-item">
+						<a class="mainMenu-link icon-table">Calendario
+						</a>
+					</li>
+					<li class="mainMenu-item">
+						<a class="mainMenu-link icon-storage">Posiciones
+						</a>
+					</li>
+					<li class="mainMenu-item">
+						<a class="mainMenu-link icon-stats">Estadísticas
+						</a>
+					</li>
+					<li class="mainMenu-item">
+						<a class="mainMenu-link icon-player">Jugadores/Técnicos
+						</a>
+					</li>		
+					<li class="mainMenu-item">
+						<a class="mainMenu-link icon-store">Tienda/Apuestas
+						</a>
+					</li>	
+				</ul>
+				<div class="botonMenu icon-reorder"/>
+			</header>
+			<section class='contenido-ppal center-block'>
+				<div>
+				<ul class="list-group">
+					<li class="list-group-item" ng-repeat="articulo in tienda.productos|orderBy:'-precio'">
+						
+						<!--Esta directiva  ng-hide le dice a todo el div, que se oculte si agotado = true en el .js-->
+						<div class="articulo"ng-hide="tienda.articulo.agotado">
+							
+							<h3 class="clearfix">{{articulo.nombre}}<em class="pull-right clearfix precio">{{articulo.precio | currency}}</em></h3>
+							<div class="fotos" ng-show="articulo.imagenes.length" ng-controller="ControladorFotos as fotos">
+								<img width="192" height="192" ng-src="{{articulo.imagenes[0]}}"/>
+								
+								<ul class="contenedorThumbs">
+									<li ng-repeat='imagen in articulo.imagenes'>
+										<img class="margin-tb" width="80" height="80" ng-src="{{imagen}}"/>
+									</li>
+								</ul>
+							</div>
+							
+							<!--El controlador de la sección descripción-comentarios con un alias = info, para no tener que llamarlo escribiendo todo el nombre-->
+							<section ng-controller="ControladorInformacion as info">
+								<!--Una lista para contener las 2 pestañas-->
+								<ul class="nav nav-pills tabs">
+									<!--Lo que hace ng-class es agregar una clase, en este caso 'active', cuando el valor de 'isSelected' sea igual a 1, esto lo evalúa en el JS -->
+									<li ng-class="{active:info.isSelected(1)}">
+										<!--Con ng-click le asigno un valor a la pestaña seleccionada, puede ser un valor directo, pero en este caso le digo que vaya al ControladorInformacion en ej JS y le asigne un 1 a la función 'selectTab'-->
+										<a href ng-click="info.selectTab(1)">Descripción</a>
+									</li>
+									<!--Lo que hace ng-class es agregar una clase, en este caso 'active', cuando el valor de 'isSelected' sea igual a 1, esto lo evalúa en el JS-->
+									<li ng-class="{active:info.isSelected(2)}">
+										<!--Con ng-click le asigno un valor a la pestaña seleccionada, puede ser un valor directo, pero en este caso le digo que vaya al ControladorInformacion en ej JS y le asigne un 2 a la función 'selectTab'-->
+										<a href ng-click="info.selectTab(2)">Comentarios</a>
+									</li>
+								</ul>
+								<!--Con ng-show le digo que muestre la descripción cuando el valor de la pestaña seleccionada, sea 1, ese 1 se lo lleva a la función 'isSelected' en el JS y compara si realmente 'tab' vale 1. También podría poner solo ng-show='tab === 2' pero es una mejor práctica tener estas evaluaciones en el JS-->
+								<div class="panel" ng-show="info.isSelected(1)">
+									<p> {{articulo.descripcion}} </p>
+								</div>
+								<!--Con ng-show le digo que muestre la descripción cuando el valor de la pestaña seleccionada sea 2, ese 2 se lo lleva a la función 'isSelected' en el JS y compara si realmente 'tab' vale 2. También podría poner solo ng-show='tab === 2' pero es una mejor práctica tener estas evaluaciones en el JS-->
+								<div class="panel" ng-show="info.isSelected(2)">
+									<blockquote>None yet</blockquote>
+								</div>
+							</section>
+
+							<!--Este botón solo se muestra si ‘puedeComprar’ en app.js, es true.-->
+							<button class='btnComprar btn btn-success' ng-show="articulo.puedeComprar">Comprar</button>
+						</div>
+					</li>
+				</ul>
+				</div>
+				<section ng-controller="TableController as table">
+					<ol class="list-group">
+						<ul class="list-unstyled clearfix">
+							<li href ng-click="table.selectOrder(0)" class="col-xs-3">EQUIPO</li>
+							<li href ng-click="table.selectOrder(2)" class="col-xs-3">PARTIDOS</li>
+							<li class="col-xs-3">+/- GOLES</li>
+							<li href ng-click="table.selectOrder(1)" class="col-xs-3">PUNTOS</li>
+						</ul>
+						<ul ng-repeat="team in table.teams" class="list-unstyled clearfix">
+							<li class="col-xs-3">{{team.name}}</li>
+							<li class="col-xs-3">{{team.jugados}}</li>
+							<li class="col-xs-3">{{team.difGol}}</li>
+							<li class="col-xs-3">{{team.points}}</li>
+						</ul>
+					</ol>
+				</section>
+			</section>
+			<section class="contenido-right">
+				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+				tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+				quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+				consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+				cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+				proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			</section>
+
+			
+		</section>
+
+		
+
+		<script type="text/javascript" src="js/hammer.min.js"></script>
+		<script type="text/javascript" src="js/jquery-1.11.2.js"></script>
+		<script type="text/javascript" src="js/angular.min.js"></script>
+		<script type="text/javascript" src="js/app.js"></script>
+	</body>
+</html>
